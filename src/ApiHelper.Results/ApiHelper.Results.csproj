@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<PackageId>ApiHelper.Results</PackageId>
+	<Authors>Leonardo de Oliveira (leo.oliveira.eng@outlook.com)</Authors>
+	<Description>This package provides support for using the Result Pattern</Description>
+	<RepositoryUrl>https://github.com/leo-oliveira-eng/api-helper-results</RepositoryUrl>
+	<PackageLicenseFile>License.txt</PackageLicenseFile>
+	<RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+	<PackageProjectUrl>https://github.com/leo-oliveira-eng/api-helper-results</PackageProjectUrl>
+	<RepositoryType>git</RepositoryType>
+	<NeutralLanguage />
+	<PackageTags>Result Pattern Maybe</PackageTags>
+	<PackageIcon>Logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+	<None Include="Logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
