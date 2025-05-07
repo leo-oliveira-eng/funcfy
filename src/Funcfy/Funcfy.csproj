@@ -4,22 +4,25 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<PackageId>ApiHelper.Results</PackageId>
+	<PackageId>Funcfy</PackageId>
+	<AssemblyName>Funcfy</AssemblyName>
+    <RootNamespace>Funcfy</RootNamespace>
 	<Authors>Leonardo de Oliveira (leo.oliveira.eng@outlook.com)</Authors>
-	<Description>This package provides support for using the Result Pattern</Description>
-	<RepositoryUrl>https://github.com/leo-oliveira-eng/api-helper-results</RepositoryUrl>
+	<Description>A lightweight, batteries-included functional programming toolkit for C#/.NET.</Description>
+	<RepositoryUrl>https://github.com/leo-oliveira-eng/funcfy</RepositoryUrl>
 	<PackageLicenseFile>License.txt</PackageLicenseFile>
 	<RequireLicenseAcceptance>false</RequireLicenseAcceptance>
-	<PackageProjectUrl>https://github.com/leo-oliveira-eng/api-helper-results</PackageProjectUrl>
+	<PackageProjectUrl>https://github.com/leo-oliveira-eng/funcfy</PackageProjectUrl>
 	<RepositoryType>git</RepositoryType>
 	<NeutralLanguage />
-	<PackageTags>Result Pattern Maybe</PackageTags>
+	<PackageTags>Functional</PackageTags>
 	<PackageIcon>Logo.png</PackageIcon>
+	<Version>0.1.0-alpha</Version>
+	<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
-	<None Include="Logo.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
