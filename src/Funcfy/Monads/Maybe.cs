@@ -70,7 +70,7 @@ public sealed class Maybe<TValue>
     #region Conversion Operators
 
     /// <summary>
-    /// Implicitly converts a <see cref="TValue"/> to a <see cref="Maybe{TValue}"/>.
+    /// Implicitly converts a <typeparamref name="TValue"/> to a <see cref="Maybe{TValue}"/>.
     /// </summary>
     /// <param name="value">
     /// A <see cref="Maybe{TValue}"/> instance containing <paramref name="value"/>.
