@@ -54,5 +54,6 @@ jobs:
           files: ./TestResults/coverage.opencover.xml
           fail_ci_if_error: true
           flags: unittests
-          name: codecov-umbrella
+          name: codecov-report-${{ matrix.os }}
           verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
