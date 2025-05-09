@@ -10,19 +10,19 @@
 	<Authors>Leonardo de Oliveira (leo.oliveira.eng@outlook.com)</Authors>
 	<Description>A lightweight, batteries-included functional programming toolkit for C#/.NET.</Description>
 	<RepositoryUrl>https://github.com/leo-oliveira-eng/funcfy</RepositoryUrl>
-	<PackageLicenseFile>License.txt</PackageLicenseFile>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<RequireLicenseAcceptance>false</RequireLicenseAcceptance>
 	<PackageProjectUrl>https://github.com/leo-oliveira-eng/funcfy</PackageProjectUrl>
 	<RepositoryType>git</RepositoryType>
 	<NeutralLanguage />
-	<PackageTags>Functional</PackageTags>
-	<PackageIcon>Logo.png</PackageIcon>
-	<Version>0.1.0-alpha</Version>
+	<PackageTags>Functional Maybe</PackageTags>	
+	<PackageIcon>logo_01.png</PackageIcon>
 	<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+	<None Include="../../LICENSE" Pack="true" PackagePath="/" />
+	<None Include="../../images/logo_01.png" Pack="true" PackagePath="$(PackageIcon)" />
   </ItemGroup>
 
 </Project>

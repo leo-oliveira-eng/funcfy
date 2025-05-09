@@ -1,0 +1,92 @@
+name: artifact
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+
+concurrency:
+  group: artifact-pack-${{ github.ref }}
+  cancel-in-progress: true
+  
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true  
+  PROJECT_PATH: 'src/Funcfy/Funcfy.csproj'
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
+
+jobs:
+  pack-artifact:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4    
+      with:
+        fetch-depth: 0
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('src/**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: setup .Net
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: restore
+      run: dotnet restore
+
+    - name: build
+      run: dotnet build -c Release --no-restore
+
+    - name: Determine package version
+      id: version
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const labels = context.payload.pull_request.labels.map(l => l.name);
+          let latest;
+          try {
+            latest = (await exec('git describe --tags --abbrev=0', {silent: true})).stdout.trim();
+          } catch {
+            latest = '0.1.0';
+          }
+          const parts = latest.replace(/^v/, '').split('.').map(n => parseInt(n, 10));
+          let [major, minor, patch] = [...parts, 0, 0, 0].slice(0, 3);
+          if (labels.includes('major')) {
+            major += 1; minor = 0; patch = 0;
+          } else if (labels.includes('minor')) {
+            minor += 1; patch = 0;
+          } else {
+            patch += 1;
+          }
+          const build = process.env.GITHUB_RUN_NUMBER;
+          const version = `${major}.${minor}.${patch}-beta.${build}`;
+          core.setOutput('version', version);
+  
+    - name: Pack
+      run: |
+        dotnet pack ${{ env.PROJECT_PATH }} \
+        --no-restore \
+        --no-build \
+        -c Release \
+        --include-symbols \
+        --include-source \
+        --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} \
+        /p:PackageVersion=${{ steps.version.outputs.version }}
+  
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: funcfy-${{ steps.version.outputs.version }}
+        if-no-files-found: error
+        path: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+        retention-days: 30
