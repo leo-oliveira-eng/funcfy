@@ -17,7 +17,6 @@
 	<NeutralLanguage />
 	<PackageTags>Functional</PackageTags>
 	<PackageIcon>Logo.png</PackageIcon>
-	<Version>0.1.0-alpha</Version>
 	<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
