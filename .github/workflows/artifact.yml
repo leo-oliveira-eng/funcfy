@@ -70,7 +70,6 @@ jobs:
           }
           const build = process.env.GITHUB_RUN_NUMBER;
           const version = `${major}.${minor}.${patch}-beta.${build}`;
-          core.exportVariable('PACKAGE_VERSION', version);
           core.setOutput('version', version);
   
     - name: Pack
@@ -81,11 +80,12 @@ jobs:
         --include-symbols \
         --include-source \
         --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} \
-        /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+        /p:PackageVersion=${{ steps.version.outputs.version }}
   
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: nupkg
+        name: funcfy-${{ steps.version.outputs.version }}
+        if-no-files-found: error
         path: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
         retention-days: 30
