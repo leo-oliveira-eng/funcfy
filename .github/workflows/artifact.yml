@@ -73,7 +73,8 @@ jobs:
           core.setOutput('version', version);
   
     - name: Pack
-      run: dotnet pack ${{ env.PROJECT_PATH }} \
+      run: |
+        dotnet pack ${{ env.PROJECT_PATH }} \
         --no-restore \
         --no-build \
         -c Release \
