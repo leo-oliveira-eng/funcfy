@@ -16,7 +16,7 @@
 	<RepositoryType>git</RepositoryType>
 	<NeutralLanguage />
 	<PackageTags>Functional</PackageTags>
-	<PackageIcon>Logo.png</PackageIcon>
+	<PackageIcon>logo.png</PackageIcon>
 	<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
