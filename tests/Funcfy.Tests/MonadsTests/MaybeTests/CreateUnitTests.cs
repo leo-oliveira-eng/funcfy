@@ -14,7 +14,7 @@ public class CreateUnitTests
         var response = Maybe<int>.Create(value);
 
         // Assert
-        response.HasValue.ShouldBeTrue();
+        response.IsFull.ShouldBeTrue();
         response.Value.ShouldBe(value);
     }
 
@@ -28,7 +28,7 @@ public class CreateUnitTests
         var response = Maybe<int?>.Create(value);
 
         // Assert
-        response.HasValue.ShouldBeFalse();
+        response.IsEmpty.ShouldBeTrue();
         response.Value.ShouldBeNull();
     }
 }

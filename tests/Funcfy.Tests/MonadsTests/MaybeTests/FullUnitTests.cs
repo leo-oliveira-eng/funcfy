@@ -2,16 +2,16 @@
 
 namespace Funcfy.Tests.MonadsTests.MaybeTests;
 
-public class ImplicitConversionUnitTests
+public class FullUnitTests
 {
     [Fact]
-    public void ImplicitConversion_ShouldReturnInstance()
+    public void Full_ShouldReturnInstance()
     {
         // Arrange
         const int value = 1;
 
         // Act
-        Maybe<int> response = value;
+        var response = Maybe<int>.Full(value);
 
         // Assert
         response.IsFull.ShouldBeTrue();
