@@ -17,7 +17,13 @@ public sealed class Maybe<TValue>
     /// Indicates whether the <see cref="Maybe{TValue}"/> instance has a value.
     /// </summary>
     [DataMember]
-    public bool HasValue => Value is not null;
+    public bool IsFull => Value is not null;
+
+    /// <summary>
+    /// Indicates whether the <see cref="Maybe{TValue}"/> instance has a value.
+    /// </summary>
+    [DataMember]
+    public bool IsEmpty => !IsFull;
 
     /// <summary>
     /// The value of the <see cref="Maybe{TValue}"/> instance.
@@ -44,7 +50,7 @@ public sealed class Maybe<TValue>
 
     #endregion
 
-    #region Methods
+    #region Factory Methods
 
     /// <summary>
     /// Creates a new instance of the <see cref="Maybe{TValue}"/> class with the specified value.
@@ -53,7 +59,7 @@ public sealed class Maybe<TValue>
     /// The value to wrap.
     /// </param>
     /// <returns>
-    /// A <see cref="Maybe{TValue}"/> where <see cref="HasValue"/> is <c>true</c> and <see cref="Value"/> equals <paramref name="value"/>.
+    /// A <see cref="Maybe{TValue}"/> where <see cref="IsFull"/> and <see cref="Value"/> equals <paramref name="value"/>.
     /// </returns>
     public static Maybe<TValue> Create(TValue value) => new(value);
 
@@ -61,9 +67,26 @@ public sealed class Maybe<TValue>
     /// Creates a new instance of the <see cref="Maybe{TValue}"/> class with no value.
     /// </summary>
     /// <returns>
-    /// A <see cref="Maybe{TValue}"/> where <see cref="HasValue"/> is <c>false</c>.
+    /// A <see cref="Maybe{TValue}"/> where <see cref="IsEmpty"/>.
     /// </returns>
     public static Maybe<TValue> Create() => new();
+
+    #endregion
+
+    #region Aliases
+
+    /// <summary>
+    /// Alias for <see cref="Create()"/>
+    /// returns an empty Maybe.
+    /// </summary>
+    public static Maybe<TValue> Empty() => Create();
+
+    /// <summary>
+    /// Alias for <see cref="Create(TValue)"/>
+    /// returns a full Maybe containing the specified value.
+    /// </summary>
+    /// <param name="value">The value to wrap.</param>
+    public static Maybe<TValue> Full(TValue value) => Create(value);
 
     #endregion
 
