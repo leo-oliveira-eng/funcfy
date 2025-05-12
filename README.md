@@ -1,3 +1,11 @@
+<p align="center">
+      <img  
+        alt="funcfy - A lightweight, batteries-included functional programming toolkit for C#/.NET." 
+        src="https://github.com/leo-oliveira-eng/funcfy/blob/main/images/logo.png"
+        height="400px"
+      />
+</p>
+
 # funcfy
 
 A lightweight, batteries-included functional programming toolkit for C#/.NET.
