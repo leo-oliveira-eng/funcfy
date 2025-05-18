@@ -1,8 +1,11 @@
 name: "Prerelease"
 
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -18,6 +21,7 @@ env:
 
 jobs:
   pack:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
