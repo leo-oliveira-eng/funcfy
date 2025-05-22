@@ -90,5 +90,5 @@ jobs:
       run: |
         dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg \
         --source ${{ env.GITHUB_FEED }} \
-        --api-key ${{ secrets.PAT }} \
+        --api-key ${{ env.GITHUB_TOKEN }} \
         --skip-duplicate
