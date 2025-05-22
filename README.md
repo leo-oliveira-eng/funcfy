@@ -6,6 +6,9 @@
       />
 </p>
 
+[![CI - Build & Test](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/build.yml/badge.svg)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/build.yml) [![artifact](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/artifact.yml/badge.svg)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/artifact.yml) [![CodeQL](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/codeql.yml/badge.svg)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/codeql.yml) [![Dependabot Updates](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/dependabot/dependabot-updates) [![Prerelease](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/prerelease.yml/badge.svg?branch=main)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/prerelease.yml) [![Release](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/release.yml/badge.svg)](https://github.com/leo-oliveira-eng/funcfy/actions/workflows/release.yml) [![codecov](https://codecov.io/gh/leo-oliveira-eng/funcfy/graph/badge.svg?token=EBEQ9TTZBG)](https://codecov.io/gh/leo-oliveira-eng/funcfy) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) ![NuGet Version](https://img.shields.io/nuget/vpre/funcfy)
+
+
 # funcfy
 
 A lightweight, batteries-included functional programming toolkit for C#/.NET.
