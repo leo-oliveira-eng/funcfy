@@ -42,13 +42,10 @@ jobs:
 
       - name: Determine package version
         id: version
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const raw = github.event.release.tag_name; 
-            const version = raw.startsWith('v') ? raw.slice(1) : raw;
-            core.setOutput('version', version);
+        run: |
+          raw=${GITHUB_REF#refs/tags/}
+          version=${raw#v}
+          echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Pack
         run: |
