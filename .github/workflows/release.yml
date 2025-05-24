@@ -10,8 +10,10 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
   PROJECT_PATH: "src/Funcfy/Funcfy.csproj"
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
 
   NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
 
   GITHUB_USER: leo-oliveira-eng
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,21 +40,41 @@ jobs:
       - name: build
         run: dotnet build -c Release --no-restore
 
-      - name: Create Release NuGet package
-        run: |
-          arrTag=(${GITHUB_REF//\// })
-          VERSION="${arrTag[2]}"
-          echo Version: $VERSION
-          VERSION="${VERSION//v}"
-          echo Clean Version: $VERSION
-          dotnet pack ${{ env.PROJECT_PATH }} -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg
+      - name: Determine package version
+        id: version
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let version;
+            try {
+                version = (await exec('git describe --tags --abbrev=0', {silent: true})).stdout.trim();
+            } catch {
+                version = 'v0.1.0';
+            }
+            core.setOutput('version', version);
 
-      - name: Push to GitHub Feed
+      - name: Pack
         run: |
-          for f in ./nupkg/*.nupkg
-          do
-            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-          done
+            dotnet pack ${{ env.PROJECT_PATH }} \
+            --no-restore \
+            --no-build \
+            -c Release \
+            --include-symbols \
+            --include-source \
+            --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} \
+            /p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Push to GitHub Packages
+        run: |
+            dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg \
+            --source ${{ env.GITHUB_FEED }} \
+            --api-key ${{ env.GITHUB_TOKEN }} \
+            --skip-duplicate
 
       - name: Push to NuGet Feed
-        run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $GITHUB_TOKEN
+        run: |
+           dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg \
+           --source ${{ env.NUGET_FEED }} \
+           --api-key ${{ env.NUGET_KEY }} \
+           --skip-duplicate
