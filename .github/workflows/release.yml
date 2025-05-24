@@ -21,7 +21,7 @@ env:
   GITHUB_PAT: ${{ secrets.PAT }}
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,12 +46,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            let version;
-            try {
-                version = (await exec('git describe --tags --abbrev=0', {silent: true})).stdout.trim();
-            } catch {
-                version = 'v0.1.0';
-            }
+            const raw = github.event.release.tag_name; 
+            const version = raw.startsWith('v') ? raw.slice(1) : raw;
             core.setOutput('version', version);
 
       - name: Pack
