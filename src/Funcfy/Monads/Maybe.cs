@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Funcfy.Monads.Extensions;
+using System.Runtime.Serialization;
 
 namespace Funcfy.Monads;
 
@@ -17,13 +18,13 @@ public sealed class Maybe<TValue>
     /// Indicates whether the <see cref="Maybe{TValue}"/> instance has a value.
     /// </summary>
     [DataMember]
-    public bool IsFull => Value is not null;
+    public bool IsFull => !IsEmpty;
 
     /// <summary>
     /// Indicates whether the <see cref="Maybe{TValue}"/> instance has a value.
     /// </summary>
     [DataMember]
-    public bool IsEmpty => !IsFull;
+    public bool IsEmpty => Value is null || Value.Equals(default(TValue));
 
     /// <summary>
     /// The value of the <see cref="Maybe{TValue}"/> instance.
@@ -87,6 +88,42 @@ public sealed class Maybe<TValue>
     /// </summary>
     /// <param name="value">The value to wrap.</param>
     public static Maybe<TValue> Full(TValue value) => Create(value);
+
+    #endregion
+
+    #region Match
+
+    /// <summary>
+    /// Executes the specified function if the <see cref="Maybe{TValue}"/> instance has a value, otherwise executes another function.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// Type of the result returned by the function.
+    /// </typeparam>
+    /// <param name="onFull">
+    /// Function to execute if the <see cref="Maybe{TValue}"/> instance has a value.
+    /// </param>
+    /// <param name="onEmpty">
+    /// Function to execute if the <see cref="Maybe{TValue}"/> instance does not have a value.
+    /// </param>
+    /// <returns>
+    /// Returns the result of the executed function based on whether the <see cref="Maybe{TValue}"/> instance has a value or not.
+    /// </returns>
+    public TResult Match<TResult>(Func<TValue, TResult> onFull, Func<TResult> onEmpty)
+        => IsFull
+            ? onFull(Value!)
+            : onEmpty();
+
+    /// <summary>
+    /// Executes the specified action if the <see cref="Maybe{TValue}"/> instance has a value, otherwise executes another action.
+    /// </summary>
+    /// <param name="onFull">
+    /// The action to execute if the <see cref="Maybe{TValue}"/> instance has a value.
+    /// </param>
+    /// <param name="onEmpty">
+    /// The action to execute if the <see cref="Maybe{TValue}"/> instance does not have a value.
+    /// </param>
+    public void Match(Action<TValue> onFull, Action onEmpty)
+        => Match(onFull.WrapAsFunc(), onEmpty.WrapAsFunc());    
 
     #endregion
 
