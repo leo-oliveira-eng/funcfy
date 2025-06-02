@@ -12,7 +12,7 @@ public class CreateEmptyUnitTests
         var response = Maybe<int>.Create();
 
         // Assert
-        response.IsFull.ShouldBeTrue();
+        response.IsEmpty.ShouldBeTrue();
         response.Value.ShouldBe(0);
     }
 
