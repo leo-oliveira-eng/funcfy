@@ -65,7 +65,7 @@ public enum MessageType : byte
     /// Represents an error message indicating that the server encountered an unexpected condition that prevented it from fulfilling the request.
     /// </summary>
     [Category("Error")]
-    InternalServerError = 9,
+    ServerError = 9,
 
     /// <summary>
     /// Represents an error message indicating that the server is currently unable to handle the request due to temporary overload or maintenance.
