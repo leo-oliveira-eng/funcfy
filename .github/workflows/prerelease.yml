@@ -71,7 +71,7 @@ jobs:
 
     - name: Create SemVer tag
       id: semver
-      uses: leo-oliveira-eng/tag-semver-action@0.1.1
+      uses: leo-oliveira-eng/tag-semver-action@0.1.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         allowed-base-branches: main
