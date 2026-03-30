@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
   pull-requests: read
 
 env:
@@ -21,7 +22,6 @@ env:
   GITHUB_USER: leo-oliveira-eng
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_FEED: https://nuget.pkg.github.com/leo-oliveira-eng/
-  GITHUB_PAT: ${{ secrets.PAT }}
 
 jobs:
   pack:
