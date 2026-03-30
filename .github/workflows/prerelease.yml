@@ -7,6 +7,10 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write
+  pull-requests: read
+
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -26,8 +30,9 @@ jobs:
 
     steps:
     - name: Checkout  
-      uses: actions/checkout@v4    
+      uses: actions/checkout@v4
       with:
+        ref: ${{ github.event.pull_request.merge_commit_sha }}
         fetch-depth: 0
 
     - name: Cache NuGet packages
@@ -49,31 +54,47 @@ jobs:
     - name: build
       run: dotnet build -c Release --no-restore
 
+    - name: Determine version bump
+      id: bump
+      shell: bash
+      run: |
+        labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+        bump="patch"
+
+        if [[ " $labels " == *" major "* ]]; then
+          bump="major"
+        elif [[ " $labels " == *" minor "* ]]; then
+          bump="minor"
+        fi
+
+        echo "bump=$bump" >> "$GITHUB_OUTPUT"
+
+    - name: Create SemVer tag
+      id: semver
+      uses: leo-oliveira-eng/tag-semver-action@0.1.2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        allowed-base-branches: main
+        tag-prefix: v
+        major-label: major
+        minor-label: minor
+        default-bump: ${{ steps.bump.outputs.bump }}
+
     - name: Determine package version
       id: version
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const labels = context.payload.pull_request.labels.map(l => l.name);
-          let latest;
-          try {
-            latest = (await exec('git describe --tags --abbrev=0', {silent: true})).stdout.trim();
-          } catch {
-            latest = '0.1.0';
-          }
-          const parts = latest.replace(/^v/, '').split('.').map(n => parseInt(n, 10));
-          let [major, minor, patch] = [...parts, 0, 0, 0].slice(0, 3);
-          if (labels.includes('major')) {
-            major += 1; minor = 0; patch = 0;
-          } else if (labels.includes('minor')) {
-            minor += 1; patch = 0;
-          } else {
-            patch += 1;
-          }
-          const build = process.env.GITHUB_RUN_NUMBER;
-          const version = `${major}.${minor}.${patch}-rc.${build}`;
-          core.setOutput('version', version);
+      shell: bash
+      run: |
+        tag="${{ steps.semver.outputs.next-tag }}"
+
+        if [[ -z "$tag" ]]; then
+          echo "Unable to determine the release tag from the SemVer action output." >&2
+          exit 1
+        fi
+
+        clean_tag="${tag#v}"
+        version="${clean_tag}-rc.${GITHUB_RUN_NUMBER}"
+
+        echo "version=$version" >> "$GITHUB_OUTPUT"
 
     - name: Pack
       run: |
