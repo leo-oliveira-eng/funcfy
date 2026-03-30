@@ -31,6 +31,8 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +50,7 @@ jobs:
         
 
       - name: Report code coverage
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v5
         with:
           files: ./TestResults/coverage.opencover.xml
@@ -56,4 +58,4 @@ jobs:
           flags: unittests
           name: codecov-report-${{ matrix.os }}
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
