@@ -82,5 +82,25 @@ public class Result
         return this;
     }
 
+    /// <summary>
+    /// Executes the specified function if the result is successful; otherwise executes another function using the current messages.
+    /// </summary>
+    /// <typeparam name="TResult">The type returned by the matching function.</typeparam>
+    /// <param name="onSuccess">Function to execute when the result is successful.</param>
+    /// <param name="onFailure">Function to execute when the result has failed.</param>
+    /// <returns>The value produced by the executed branch.</returns>
+    public TResult Match<TResult>(Func<TResult> onSuccess, Func<IReadOnlyList<Message>, TResult> onFailure)
+        => IsSuccessful
+            ? onSuccess()
+            : onFailure(Messages);
+
+    /// <summary>
+    /// Executes the specified action if the result is successful; otherwise executes another action using the current messages.
+    /// </summary>
+    /// <param name="onSuccess">Action to execute when the result is successful.</param>
+    /// <param name="onFailure">Action to execute when the result has failed.</param>
+    public void Match(Action onSuccess, Action<IReadOnlyList<Message>> onFailure)
+        => Match(onSuccess.WrapAsFunc(), onFailure.WrapAsFunc());
+
     #endregion
 }
