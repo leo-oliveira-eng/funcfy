@@ -1,4 +1,5 @@
 ﻿using Funcfy.Monads.Enums;
+using Funcfy.Types;
 using System.Runtime.Serialization;
 
 namespace Funcfy.Monads;
@@ -100,6 +101,39 @@ public class Result<TValue> : Result
     {
         Data = Maybe<TValue>.Create(value);
         return this;
+    }
+
+    /// <summary>
+    /// Executes the specified function if the result is successful; otherwise executes another function using the current messages.
+    /// </summary>
+    /// <typeparam name="TResult">The type returned by the matching function.</typeparam>
+    /// <param name="onSuccess">Function to execute when the result is successful.</param>
+    /// <param name="onFailure">Function to execute when the result has failed.</param>
+    /// <returns>The value produced by the executed branch.</returns>
+    public TResult Match<TResult>(Func<Maybe<TValue>, TResult> onSuccess, Func<IReadOnlyList<Message>, TResult> onFailure)
+        => IsSuccessful
+            ? onSuccess(Data)
+            : onFailure(Messages);
+
+    /// <summary>
+    /// Executes the specified action if the result is successful; otherwise executes another action using the current messages.
+    /// </summary>
+    /// <param name="onSuccess">Action to execute when the result is successful.</param>
+    /// <param name="onFailure">Action to execute when the result has failed.</param>
+    public void Match(Action<Maybe<TValue>> onSuccess, Action<IReadOnlyList<Message>> onFailure)
+    {
+        Match(
+            maybe =>
+            {
+                onSuccess(maybe);
+                return new Unit();
+            },
+            messages =>
+            {
+                onFailure(messages);
+                return new Unit();
+            }
+        );
     }
 
     #endregion
