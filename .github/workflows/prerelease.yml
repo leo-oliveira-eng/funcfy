@@ -1,38 +1,31 @@
 name: "Prerelease"
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
+  push:
+    tags:
+      - "v*"
 
 permissions:
-  contents: write
+  contents: read
   packages: write
-  pull-requests: read
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  
-  PROJECT_PATH: 'src/Funcfy/Funcfy.csproj'
+  PROJECT_PATH: "src/Funcfy/Funcfy.csproj"
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
-
-  GITHUB_USER: leo-oliveira-eng
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_FEED: https://nuget.pkg.github.com/leo-oliveira-eng/
 
 jobs:
   pack:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout  
-      uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v5
       with:
-        ref: ${{ github.event.pull_request.merge_commit_sha }}
+        ref: ${{ github.ref }}
         fetch-depth: 0
 
     - name: Cache NuGet packages
@@ -54,40 +47,14 @@ jobs:
     - name: build
       run: dotnet build -c Release --no-restore
 
-    - name: Determine version bump
-      id: bump
-      shell: bash
-      run: |
-        labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
-        bump="patch"
-
-        if [[ " $labels " == *" major "* ]]; then
-          bump="major"
-        elif [[ " $labels " == *" minor "* ]]; then
-          bump="minor"
-        fi
-
-        echo "bump=$bump" >> "$GITHUB_OUTPUT"
-
-    - name: Create SemVer tag
-      id: semver
-      uses: leo-oliveira-eng/tag-semver-action@0.1.2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        allowed-base-branches: main
-        tag-prefix: v
-        major-label: major
-        minor-label: minor
-        default-bump: ${{ steps.bump.outputs.bump }}
-
     - name: Determine package version
       id: version
       shell: bash
       run: |
-        tag="${{ steps.semver.outputs.next-tag }}"
+        tag="${GITHUB_REF_NAME}"
 
         if [[ -z "$tag" ]]; then
-          echo "Unable to determine the release tag from the SemVer action output." >&2
+          echo "Unable to determine the tag name from the workflow context." >&2
           exit 1
         fi
 
