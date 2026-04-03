@@ -1,124 +1,54 @@
 <p align="center">
-      <img  
-        alt="funcfy - A lightweight, batteries-included functional programming toolkit for C#/.NET." 
-        src="https://github.com/leo-oliveira-eng/funcfy/blob/main/images/logo.png"
-        height="400px"
-      />
+  <img
+    alt="funcfy - A lightweight, batteries-included functional programming toolkit for C#/.NET."
+    src="https://github.com/leo-oliveira-eng/funcfy/blob/main/images/logo.png"
+    height="320px"
+  />
 </p>
 
 # funcfy
 
 A lightweight, batteries-included functional programming toolkit for C#/.NET.
 
-## Features
+## Why Funcfy
 
-📋 Currying & partial application  
-🔄 Either, Maybe, Result types  
-📋 Functor, Applicative, Monad interfaces  
-📋 Lens utilities, compose, pipe
+Functional programming can make application code easier to reason about when it is used in the right places. `funcfy` is not trying to force a pure functional style across an entire .NET codebase. The goal is to provide a small set of practical tools that help developers model optional values, success/failure flows, and explicit branching in a clear and predictable way.
 
-## Getting Started
+In practice, this can help you:
 
-Install via NuGet:
+- reduce null-related checks and make missing values explicit with `Maybe<T>`
+- represent operation outcomes without relying only on exceptions for expected business cases
+- keep success and failure handling close to the code path through `Match`
+- carry structured messages that are easier to translate into API responses
+- make service and application-layer code more expressive while staying familiar to C# developers
+
+## What It Includes
+
+- `Maybe<T>` for optional values
+- `Result` and `Result<T>` for success/failure flows with typed messages
+- `Match` APIs for `Maybe<T>`, `Result`, and `Result<T>`
+- message helpers and typed error categories
+- ASP.NET Core helpers to convert results into `IActionResult`
+
+## Install
 
 ```bash
-dotnet add package Funcfy --version 0.1.0-alpha
+dotnet add package Funcfy
 ```
 
-Import the core namespace:
+## Documentation
 
-```csharp
-using Funcfy;
-```
+For detailed guides, API references, examples, and more, explore our documentation:
 
-Example currying:
+- **[Getting Started](./docs/README.md)** - Quick start guide to using funcfy in your projects
+- **[API Reference](./docs/README.md)** - Complete documentation of all types, methods, and extensions
+- **[Roadmap](./docs/roadmap.md)** - Upcoming features and planned improvements
 
-```csharp
-var add = Func.Curry((int x, int y) => x + y);
-var add5 = add(5);
-Console.WriteLine(add5(3));  // 8
-```
-
-## Using Maybe<T>
-
-The `Maybe<T>` type expresses optional values explicitly, avoiding null-reference surprises. Example:
-
-
-  ```csharp
-    public class RepositoryAsync<Entity> : SpecificMethods<Entity>, IRepositoryAsync<Entity>
-    {
-    ...
-
-    public async Task<Maybe<Entity>> FindAsync(int id)
-        => await DbSet.FirstOrDefaultAsync(entity => entity.Id.Equals(id));
-        
-    ...
-    }
-        
-  ```
-
-The developer can act as follows when receiving the response:
-
-  ```csharp
-
-    ...
-
-        var entity = await EntityRepository.FindAsync(entityId);
-
-        if (entity.IsEmpty)
-            return response.WithError("Not found");
-
-    ...
-
-  ```
-
-### Creating Instances
-
-- **Empty** (no value):
-
-  ```csharp
-  var empty = Maybe<int>.Empty();          // IsFull == false, IsEmpty == true
-  ```
-
-- **Full** (with a value):
-
-  ```csharp
-  var full = Maybe<string>.Full("hello");  // IsFull == true, Value == "hello"
-  Maybe<int> also = 42;                      // implicit conversion wraps 42 as Full
-  ```
-
-### Inspecting Values
-
-Use `IsFull` or `IsEmpty` before accessing `Value`:
-
-```csharp
-if (full.IsFull)
-{
-    Console.WriteLine(full.Value);
-}
-else
-{
-    Console.WriteLine("No value present.");
-}
-```
-
-### Conversion Operators
-
-Thanks to the implicit operator, you can assign raw values directly:
-
-```csharp
-Maybe<double> pi = 3.14;  // equivalent to Maybe<double>.Full(3.14)
-```
-
-> ⚠️ **Important:** Accessing `Value` when `IsEmpty` is `true` returns `null` for reference types or the default for value types. Always check `IsFull` first.
+Whether you're a developer looking to use funcfy or a contributor wanting to understand the codebase, our docs have you covered.
 
 ## Contributing
 
-1. Fork the repo  
-2. Create a feature branch (`git checkout -b feature/foo`)  
-3. Commit changes (`git commit -m 'feat: add foo'`)  
-4. Push to your branch (`git push origin feature/foo`)  
-5. Open a Pull Request to develop branch
-
----
-
+1. Fork the repository.
+2. Create a feature branch from `develop`.
+3. Commit your changes using a clear conventional-style message.
+4. Push your branch and open a pull request to `develop`.
