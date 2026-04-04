@@ -105,6 +105,28 @@ public async Task<IActionResult> Create(CreateCustomerCommand command)
 
 That is a lot easier to scan.
 
+## Example: query controller with `Result<T>`
+
+`ToActionResult()` currently targets non-generic `Result`, but `Result<T>` still fits query endpoints when you shape the payload explicitly:
+
+```csharp
+[HttpGet("{id:guid}")]
+public async Task<IActionResult> GetById(Guid id)
+{
+    var result = await _service.GetCustomerAsync(id);
+
+    return result.Match<IActionResult>(
+        onSuccess: customer => customer.Match<IActionResult>(
+            onFull: value => Ok(value),
+            onEmpty: () => NoContent()
+        ),
+        onFailure: messages => Result.Failure(messages[0]).ToErrorActionResult()
+    );
+}
+```
+
+That keeps the service expressive while still returning conventional HTTP responses.
+
 ## Advantages in practice
 
 ### 1. Thin controllers

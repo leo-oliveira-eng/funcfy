@@ -233,6 +233,30 @@ var result = Result<string>.Create()
     .SetValue("cached-response");
 ```
 
+## Example: result extension helpers in a service
+
+The fluent extension helpers are useful when a service needs to accumulate business and validation messages while keeping a single return type:
+
+```csharp
+public Result ValidateProfile(UpdateProfileCommand command)
+{
+    var result = Result.Create();
+
+    if (string.IsNullOrWhiteSpace(command.DisplayName))
+        result.WithBadRequest("Display name is required", code: "DISPLAY_NAME_REQUIRED", source: nameof(command.DisplayName));
+
+    if (command.DisplayName?.Length > 100)
+        result.WithBusinessError("Display name is too long", code: "DISPLAY_NAME_TOO_LONG", source: nameof(command.DisplayName));
+
+    if (result.IsSuccessful)
+        result.WithInformation("Profile validation passed", code: "PROFILE_VALIDATED");
+
+    return result;
+}
+```
+
+That same pattern works with `Result<T>` when the operation also needs to return data.
+
 ## `Match` in practice
 
 `Match` helps keep the handling logic close to the result.

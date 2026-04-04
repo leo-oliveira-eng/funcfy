@@ -195,6 +195,25 @@ var message = order.Match(
 );
 ```
 
+## Example: controller layer
+
+When a controller only needs to branch on presence or absence, `Maybe<T>.Match` keeps that decision explicit:
+
+```csharp
+[HttpGet("{id:guid}")]
+public async Task<IActionResult> GetById(Guid id)
+{
+    var customer = await _service.FindCustomerAsync(id);
+
+    return customer.Match<IActionResult>(
+        onFull: value => Ok(value),
+        onEmpty: () => NotFound()
+    );
+}
+```
+
+If the endpoint also needs richer validation or business error details, prefer returning `Result<T>` from the service and translating that at the HTTP boundary.
+
 ## When to use `Maybe<T>` vs `Result<T>`
 
 Use `Maybe<T>` when:
