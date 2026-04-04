@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\..\src\Funcfy\Funcfy.csproj" />
   </ItemGroup>
 
