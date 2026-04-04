@@ -41,8 +41,12 @@ dotnet add package Funcfy
 For detailed guides, API references, examples, and more, explore our documentation:
 
 - **[Getting Started](./docs/README.md)** - Quick start guide to using funcfy in your projects
+- **[Maybe](./docs/maybe.md)** - Optional-value patterns with service and controller examples
+- **[Result](./docs/result.md)** - Success/failure flows, messages, and extension helpers
+- **[ASP.NET Core](./docs/aspnetcore.md)** - Controller translation patterns and HTTP mapping
 - **[API Reference](./docs/README.md)** - Complete documentation of all types, methods, and extensions
 - **[Roadmap](./docs/roadmap.md)** - Upcoming features and planned improvements
+- **[Changelog](./CHANGELOG.md)** - Release notes and noteworthy package/runtime changes
 
 Whether you're a developer looking to use funcfy or a contributor wanting to understand the codebase, our docs have you covered.
 

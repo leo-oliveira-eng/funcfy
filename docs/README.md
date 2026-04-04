@@ -17,6 +17,14 @@ Today the project is centered on:
 - [Maybe](./maybe.md)
 - [Result](./result.md)
 - [ASP.NET Core](./aspnetcore.md)
+- [Roadmap](./roadmap.md)
+- [Changelog](../CHANGELOG.md)
+
+If you are looking for concrete usage patterns first, start with:
+
+- [Maybe service/controller examples](./maybe.md#example-service-layer)
+- [Result service examples and extension helpers](./result.md#example-result-extension-helpers-in-a-service)
+- [ASP.NET Core controller examples](./aspnetcore.md#example-controller-with-toactionresult)
 
 ## Current API Surface
 
