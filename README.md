@@ -17,6 +17,7 @@ Functional programming can make application code easier to reason about when it 
 In practice, this can help you:
 
 - reduce null-related checks and make missing values explicit with `Maybe<T>`
+- make recoverable failure explicit with `Either<TLeft, TRight>`
 - represent operation outcomes without relying only on exceptions for expected business cases
 - keep success and failure handling close to the code path through `Match`
 - carry structured messages that are easier to translate into API responses
@@ -25,8 +26,9 @@ In practice, this can help you:
 ## What It Includes
 
 - `Maybe<T>` for optional values
+- `Either<TLeft, TRight>` for right-biased success/failure composition
 - `Result` and `Result<T>` for success/failure flows with typed messages
-- `Match` APIs for `Maybe<T>`, `Result`, and `Result<T>`
+- `Match` APIs for `Maybe<T>`, `Either<TLeft, TRight>`, `Result`, and `Result<T>`
 - message helpers and typed error categories
 - ASP.NET Core helpers to convert results into `IActionResult`
 
@@ -42,6 +44,7 @@ For detailed guides, API references, examples, and more, explore our documentati
 
 - **[Getting Started](./docs/README.md)** - Quick start guide to using funcfy in your projects
 - **[Maybe](./docs/maybe.md)** - Optional-value patterns with service and controller examples
+- **[Either](./docs/either.md)** - Explicit recoverable failures with right-biased composition
 - **[Result](./docs/result.md)** - Success/failure flows, messages, and extension helpers
 - **[ASP.NET Core](./docs/aspnetcore.md)** - Controller translation patterns and HTTP mapping
 - **[API Reference](./docs/README.md)** - Complete documentation of all types, methods, and extensions

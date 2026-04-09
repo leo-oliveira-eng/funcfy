@@ -7,6 +7,7 @@
 Today the project is centered on:
 
 - `Maybe<T>` for optional values
+- `Either<TLeft, TRight>` for recoverable success/failure composition
 - `Result` and `Result<T>` for operation outcomes
 - `Message` and `MessageType` for structured success, warning, and error information
 - extension helpers for building and combining results
@@ -15,6 +16,7 @@ Today the project is centered on:
 ## Guides
 
 - [Maybe](./maybe.md)
+- [Either](./either.md)
 - [Result](./result.md)
 - [ASP.NET Core](./aspnetcore.md)
 - [Roadmap](./roadmap.md)
@@ -23,6 +25,7 @@ Today the project is centered on:
 If you are looking for concrete usage patterns first, start with:
 
 - [Maybe service/controller examples](./maybe.md#example-service-layer)
+- [Either validation and chaining examples](./either.md#validation-example)
 - [Result service examples and extension helpers](./result.md#example-result-extension-helpers-in-a-service)
 - [ASP.NET Core controller examples](./aspnetcore.md#example-controller-with-toactionresult)
 
@@ -71,6 +74,32 @@ var result = Result.Success()
 var status = result.Match(
     onSuccess: () => "ok",
     onFailure: messages => $"failed: {messages[0].Content}"
+);
+```
+
+### `Either<TLeft, TRight>`
+
+Use `Either<TLeft, TRight>` when an operation can fail in a recoverable, typed way and you want right-biased composition.
+
+Main capabilities:
+
+- `Either.Left` and `Either.Right`
+- `IsLeft` and `IsRight`
+- `Match`
+- `Map`, `MapLeft`, and `Bind`
+- `GetOrElse` and `OrElse`
+- `Tap` and `TapLeft`
+- conversion helpers to `Maybe<T>` and `Result<T>`
+
+Example:
+
+```csharp
+var either = Either.Right<string, int>(21)
+    .Map(value => value * 2);
+
+var text = either.Match(
+    onLeft: error => $"Error: {error}",
+    onRight: value => $"Value: {value}"
 );
 ```
 

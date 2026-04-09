@@ -12,6 +12,7 @@ The intended scope of `funcfy` is centered on these feature areas:
 ## Current
 
 - `Maybe<T>` with creation helpers, implicit conversion, and `Match`
+- `Either<TLeft, TRight>` with explicit left/right creation, right-biased composition, and conversion helpers
 - `Result` and `Result<T>` with structured messages
 - success/failure `Match` support for `Result` and `Result<T>`
 - typed message helpers for common application and HTTP-style error cases
@@ -23,7 +24,6 @@ The intended scope of `funcfy` is centered on these feature areas:
 
 ## Near Term
 
-- add `Either` as a first-class monad in the library surface
 - expand result-to-HTTP integration for generic `Result<T>`
 - document guidance for message codes, sources, and error handling conventions
 
