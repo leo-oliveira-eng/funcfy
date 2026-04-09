@@ -10,6 +10,8 @@ This project follows a lightweight changelog format:
 
 ## Unreleased
 
+## 0.3.0 - 2026-04-08
+
 ### Added
 
 - Introduced `Either<TLeft, TRight>` as a first-class right-biased monad with `Left`/`Right` factories, `Match`, `Map`, `MapLeft`, `Bind`, recovery helpers, and side-effect helpers.
