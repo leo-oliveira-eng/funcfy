@@ -21,6 +21,26 @@ public class ConversionUnitTests
     }
 
     [Fact]
+    public void ToEither_WhenMaybeIsFull_ShouldNotInvokeOnEmptyFactory()
+    {
+        // Arrange
+        Maybe<int> maybe = 42;
+        var factoryCallCount = 0;
+
+        // Act
+        var either = maybe.ToEither(() =>
+        {
+            factoryCallCount++;
+            return "missing";
+        });
+
+        // Assert
+        factoryCallCount.ShouldBe(0);
+        either.IsRight.ShouldBeTrue();
+        either.Match(left => left.Length, right => right).ShouldBe(42);
+    }
+
+    [Fact]
     public void ToEither_WhenMaybeIsEmpty_ShouldReturnLeft()
     {
         // Arrange
@@ -93,5 +113,15 @@ public class ConversionUnitTests
         result.Messages[0].Content.ShouldBe("missing");
         result.Messages[0].Type.ShouldBe(MessageType.NotFound);
         result.Messages[0].Code.ShouldBe("NF001");
+    }
+
+    [Fact]
+    public void ToResult_WhenMapLeftReturnsNull_ShouldThrow()
+    {
+        // Arrange
+        var either = Either.Left<string, int>("missing");
+
+        // Act & Assert
+        Should.Throw<ArgumentNullException>(() => either.ToResult(_ => null!));
     }
 }

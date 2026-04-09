@@ -44,6 +44,25 @@ public class RecoveryUnitTests
     }
 
     [Fact]
+    public void GetOrElse_WithDelegate_WhenRight_ShouldReturnRightValueWithoutInvokingFallback()
+    {
+        // Arrange
+        var either = Either.Right<string, int>(42);
+        var fallbackCallCount = 0;
+
+        // Act
+        var value = either.GetOrElse(left =>
+        {
+            fallbackCallCount++;
+            return left.Length;
+        });
+
+        // Assert
+        fallbackCallCount.ShouldBe(0);
+        value.ShouldBe(42);
+    }
+
+    [Fact]
     public void OrElse_WithLeftDependentFallback_WhenLeft_ShouldReturnFallback()
     {
         // Arrange
@@ -58,6 +77,16 @@ public class RecoveryUnitTests
     }
 
     [Fact]
+    public void OrElse_WithLeftDependentFallback_WhenFallbackReturnsNull_ShouldThrow()
+    {
+        // Arrange
+        var either = Either.Left<string, int>("missing");
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => either.OrElse(_ => null!));
+    }
+
+    [Fact]
     public void OrElse_WithParameterlessFallback_WhenLeft_ShouldReturnFallback()
     {
         // Arrange
@@ -69,6 +98,16 @@ public class RecoveryUnitTests
         // Assert
         recovered.IsRight.ShouldBeTrue();
         recovered.Match(left => left.Length, right => right).ShouldBe(99);
+    }
+
+    [Fact]
+    public void OrElse_WithParameterlessFallback_WhenFallbackReturnsNull_ShouldThrow()
+    {
+        // Arrange
+        var either = Either.Left<string, int>("missing");
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => either.OrElse(() => null!));
     }
 
     [Fact]

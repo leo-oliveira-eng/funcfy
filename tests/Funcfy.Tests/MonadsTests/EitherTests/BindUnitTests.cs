@@ -51,4 +51,14 @@ public class BindUnitTests
         bound.IsLeft.ShouldBeTrue();
         bound.Match(left => left, right => right.ToString()).ShouldBe("invalid");
     }
+
+    [Fact]
+    public void Bind_WhenBinderReturnsNull_ShouldThrow()
+    {
+        // Arrange
+        var either = Either.Right<string, int>(10);
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => either.Bind<int>(_ => null!));
+    }
 }
