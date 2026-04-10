@@ -1,0 +1,54 @@
+name: "Tag Main"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: tag-main-${{ github.event.pull_request.base.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout merged commit
+      uses: actions/checkout@v5
+      with:
+        ref: ${{ github.event.pull_request.merge_commit_sha }}
+        fetch-depth: 0
+
+    - name: Determine version bump
+      id: bump
+      shell: bash
+      run: |
+        labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+        bump="patch"
+
+        if [[ " $labels " == *" major "* ]]; then
+          bump="major"
+        elif [[ " $labels " == *" minor "* ]]; then
+          bump="minor"
+        fi
+
+        echo "bump=$bump" >> "$GITHUB_OUTPUT"
+
+    - name: Create SemVer tag
+      id: semver
+      uses: leo-oliveira-eng/tag-semver-action@0.1.2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        allowed-base-branches: main
+        tag-prefix: v
+        major-label: major
+        minor-label: minor
+        default-bump: ${{ steps.bump.outputs.bump }}
