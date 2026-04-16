@@ -19,6 +19,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', 'global.json', 'nuget.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -42,20 +50,61 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', 'global.json', 'nuget.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
       - name: Test
-        run: dotnet test --configuration Release --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./TestResults/ /p:MergeWith=./TestResults/coverage.opencover.xml --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+        run: dotnet test --configuration Release --no-restore --verbosity normal --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
         env:
           DOTNET_CLI_TELEMETRY_OPTOUT: true
           DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-        
 
-      - name: Report code coverage
-        if: matrix.os == 'ubuntu-latest' && env.CODECOV_TOKEN != ''
+  coverage:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', 'global.json', 'nuget.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Collect coverage
+        run: dotnet test tests/Funcfy.Tests/Funcfy.Tests.csproj --configuration Release --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./TestResults/coverage.opencover.xml --logger "trx;LogFileName=coverage_test_results.trx" --results-directory ./TestResults
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: true
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+      - name: Upload code coverage report
+        if: env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v5
         with:
           files: ./TestResults/coverage.opencover.xml
           fail_ci_if_error: true
           flags: unittests
-          name: codecov-report-${{ matrix.os }}
+          name: codecov-report-ubuntu-latest
           verbose: true
           token: ${{ env.CODECOV_TOKEN }}
