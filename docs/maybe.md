@@ -52,6 +52,11 @@ You do not need deep category theory to benefit from it. The win is mostly about
 - `Value`
 - implicit conversion from `T` to `Maybe<T>`
 - `Match`
+- `Map`
+- `Bind`
+- `GetOrElse`
+- `OrElse`
+- `Tap`
 
 ## Creating values
 
@@ -111,6 +116,146 @@ maybe.Match(
     onEmpty: () => Console.WriteLine("Nothing to process")
 );
 ```
+
+## Helper methods for fluent workflows
+
+`Match` is still the clearest option when you want to branch explicitly.
+
+The helper methods are useful when you want to keep a value in a pipeline and only decide what to do with emptiness at the edges.
+
+### `Map`
+
+`Map` transforms the wrapped value only when the `Maybe<T>` is full.
+
+If the instance is empty, the result stays empty.
+
+```csharp
+Maybe<string> maybeName = "funcfy";
+
+var maybeLength = maybeName.Map(name => name.Length);
+```
+
+That is helpful when the next step is just a value transformation, not another optional computation.
+
+### `Bind`
+
+`Bind` is for chaining operations that already return `Maybe<T>`.
+
+It avoids creating nested types such as `Maybe<Maybe<T>>`.
+
+```csharp
+static Maybe<string> NormalizeQuantityInput(string raw) =>
+    string.IsNullOrWhiteSpace(raw)
+        ? Maybe<string>.Empty()
+        : Maybe<string>.Full(raw.Trim());
+
+static Maybe<int> ParseQuantity(string sku) =>
+    int.TryParse(sku, out var quantity)
+        ? Maybe<int>.Full(quantity)
+        : Maybe<int>.Empty();
+
+Maybe<string> input = "12";
+
+var maybeQuantity = input
+    .Bind(NormalizeQuantityInput)
+    .Bind(ParseQuantity);
+```
+
+### `GetOrElse`
+
+`GetOrElse` unwraps the value when present and returns a fallback when absent.
+
+Use it when the caller needs a concrete `T`, not another `Maybe<T>`.
+
+```csharp
+Maybe<decimal> maybeDiscount = Maybe<decimal>.Empty();
+
+var discount = maybeDiscount.GetOrElse(0m);
+var computed = maybeDiscount.GetOrElse(() => 0.05m);
+```
+
+The function overload is useful when the fallback is expensive or should only run for empty values.
+
+### `OrElse`
+
+`OrElse` keeps the current `Maybe<T>` when it is full.
+
+When it is empty, it asks for another `Maybe<T>` as a fallback source.
+
+```csharp
+Maybe<string> cachedName = Maybe<string>.Empty();
+
+var resolvedName = cachedName.OrElse(() => Maybe<string>.Full("guest"));
+```
+
+This is a good fit when the fallback may also be empty and you want to stay inside the `Maybe<T>` abstraction.
+
+### `Tap`
+
+`Tap` executes a side effect only when the instance is full and then returns the original `Maybe<T>`.
+
+That makes it useful for logging, metrics, or tracing without breaking a fluent chain.
+
+```csharp
+Maybe<int> maybeCustomerId = 42;
+
+var sameMaybe = maybeCustomerId
+    .Tap(id => Console.WriteLine($"Resolved customer {id}"))
+    .Map(id => id * 10);
+```
+
+## Composition example
+
+The helpers become most useful when you combine them:
+
+```csharp
+static Maybe<string> NormalizeEmail(string email) =>
+    string.IsNullOrWhiteSpace(email)
+        ? Maybe<string>.Empty()
+        : Maybe<string>.Full(email.Trim().ToLowerInvariant());
+
+static Maybe<string> EnsureCompanyDomain(string email) =>
+    email.EndsWith("@funcfy.dev", StringComparison.Ordinal)
+        ? Maybe<string>.Full(email)
+        : Maybe<string>.Empty();
+
+Maybe<string> input = " TEAM@FUNCFY.DEV ";
+
+var message = input
+    .Bind(NormalizeEmail)
+    .Bind(EnsureCompanyDomain)
+    .Tap(email => Console.WriteLine($"Accepted: {email}"))
+    .Map(email => $"Invite will be sent to {email}")
+    .GetOrElse("No valid company email was provided.");
+```
+
+In that flow:
+
+- `Bind` keeps short-circuiting on empty values
+- `Tap` observes the successful path without changing it
+- `Map` converts the successful value into the final message
+- `GetOrElse` decides the fallback only at the end
+
+## Fallback example
+
+Fallbacks are often easier to read when you separate "find an optional value" from "decide what to do if it is missing":
+
+```csharp
+Maybe<string> fromCache = Maybe<string>.Empty();
+Maybe<string> fromConfig = "default-theme";
+
+var theme = fromCache
+    .OrElse(() => fromConfig)
+    .Map(value => value.Trim())
+    .GetOrElse("system");
+```
+
+Here:
+
+- `OrElse` tries another optional source
+- `Map` refines the successful value
+- `GetOrElse` produces the final concrete fallback
+
 
 ## Advantages in practice
 

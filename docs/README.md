@@ -41,16 +41,21 @@ Main capabilities:
 - `IsEmpty`, `IsFull`, and `Value`
 - implicit conversion from `T` to `Maybe<T>`
 - `Match` for branching without manual null-like checks
+- `Map` and `Bind` for fluent optional composition
+- `GetOrElse` and `OrElse` for fallback handling
+- `Tap` for side effects on the full path
+
+Unlike `Either<TLeft, TRight>`, `Maybe<T>` has no left payload, so helpers such as `MapLeft` and `TapLeft` are intentionally not part of this API.
 
 Example:
 
 ```csharp
 Maybe<int> maybe = 42;
 
-var text = maybe.Match(
-    onFull: value => $"Value: {value}",
-    onEmpty: () => "No value"
-);
+var text = maybe
+    .Map(value => value * 2)
+    .GetOrElse(0)
+    .ToString();
 ```
 
 ### `Result`
