@@ -101,9 +101,14 @@ public sealed record Maybe<TValue>
     /// Returns the result of the executed function based on whether the <see cref="Maybe{TValue}"/> instance has a value or not.
     /// </returns>
     public TResult Match<TResult>(Func<TValue, TResult> onFull, Func<TResult> onEmpty)
-        => IsFull
+    {
+        ArgumentNullException.ThrowIfNull(onFull);
+        ArgumentNullException.ThrowIfNull(onEmpty);
+
+        return IsFull
             ? onFull(Value!)
             : onEmpty();
+    }
 
     /// <summary>
     /// Executes the specified action if the <see cref="Maybe{TValue}"/> instance has a value, otherwise executes another action.
@@ -111,7 +116,110 @@ public sealed record Maybe<TValue>
     /// <param name="onFull">The action to execute if the <see cref="Maybe{TValue}"/> instance has a value.</param>
     /// <param name="onEmpty">The action to execute if the <see cref="Maybe{TValue}"/> instance does not have a value.</param>
     public void Match(Action<TValue> onFull, Action onEmpty)
-        => Match(onFull.WrapAsFunc(), onEmpty.WrapAsFunc());    
+    {
+        ArgumentNullException.ThrowIfNull(onFull);
+        ArgumentNullException.ThrowIfNull(onEmpty);
+
+        Match(onFull.WrapAsFunc(), onEmpty.WrapAsFunc());
+    }
+
+    #endregion
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Transforms the wrapped value when the current instance is full.
+    /// </summary>
+    /// <typeparam name="TResult">The type produced by the mapping function.</typeparam>
+    /// <param name="mapper">Function used to transform the wrapped value.</param>
+    /// <returns>
+    /// A new <see cref="Maybe{TResult}"/> carrying the transformed value when full; otherwise an empty <see cref="Maybe{TResult}"/>.
+    /// </returns>
+    public Maybe<TResult> Map<TResult>(Func<TValue, TResult> mapper)
+    {
+        ArgumentNullException.ThrowIfNull(mapper);
+
+        return Match(
+            onFull: value => Maybe<TResult>.Create(mapper(value)),
+            onEmpty: Maybe<TResult>.Empty
+        );
+    }
+
+    /// <summary>
+    /// Chains computations that return <see cref="Maybe{TValue}"/>, short-circuiting when the current instance is empty.
+    /// </summary>
+    /// <typeparam name="TResult">The type carried by the bound value.</typeparam>
+    /// <param name="binder">Function used to continue the computation when the instance is full.</param>
+    /// <returns>
+    /// The result produced by the binder when full; otherwise an empty <see cref="Maybe{TResult}"/>.
+    /// </returns>
+    public Maybe<TResult> Bind<TResult>(Func<TValue, Maybe<TResult>> binder)
+    {
+        ArgumentNullException.ThrowIfNull(binder);
+
+        return Match(
+            onFull: value => binder(value) ?? throw new InvalidOperationException("The binder returned null."),
+            onEmpty: Maybe<TResult>.Empty
+        );
+    }
+
+    /// <summary>
+    /// Returns the wrapped value when present, otherwise returns the provided fallback value.
+    /// </summary>
+    /// <param name="fallback">Fallback value used when the current instance is empty.</param>
+    /// <returns>The wrapped value when full; otherwise <paramref name="fallback"/>.</returns>
+    public TValue GetOrElse(TValue fallback)
+        => Match(
+            onFull: value => value,
+            onEmpty: () => fallback
+        );
+
+    /// <summary>
+    /// Returns the wrapped value when present, otherwise computes a fallback value.
+    /// </summary>
+    /// <param name="fallback">Function used to compute the fallback value when the current instance is empty.</param>
+    /// <returns>The wrapped value when full; otherwise the value produced by <paramref name="fallback"/>.</returns>
+    public TValue GetOrElse(Func<TValue> fallback)
+    {
+        ArgumentNullException.ThrowIfNull(fallback);
+
+        return Match(
+            onFull: value => value,
+            onEmpty: fallback
+        );
+    }
+
+    /// <summary>
+    /// Returns the current instance when it is full; otherwise computes a fallback instance.
+    /// </summary>
+    /// <param name="fallback">Function used to compute the fallback instance when the current instance is empty.</param>
+    /// <returns>The current instance when full; otherwise the fallback instance.</returns>
+    public Maybe<TValue> OrElse(Func<Maybe<TValue>> fallback)
+    {
+        ArgumentNullException.ThrowIfNull(fallback);
+
+        return Match(
+            onFull: _ => this,
+            onEmpty: () => fallback() ?? throw new InvalidOperationException("The fallback returned null.")
+        );
+    }
+
+    /// <summary>
+    /// Executes a side effect when the current instance is full and returns the original instance.
+    /// </summary>
+    /// <param name="onFull">Action executed when the current instance is full.</param>
+    /// <returns>The original <see cref="Maybe{TValue}"/> instance.</returns>
+    public Maybe<TValue> Tap(Action<TValue> onFull)
+    {
+        ArgumentNullException.ThrowIfNull(onFull);
+
+        Match(
+            onFull: onFull,
+            onEmpty: () => { }
+        );
+
+        return this;
+    }
 
     #endregion
 

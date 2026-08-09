@@ -10,6 +10,11 @@ This project follows a lightweight changelog format:
 
 ## Unreleased
 
+### Documentation
+
+- Expanded `Maybe<T>` documentation with the new helper methods `Map`, `Bind`, `GetOrElse`, `OrElse`, and `Tap`, including composition and fallback examples.
+- Clarified in the `Maybe<T>` guide and docs index why `MapLeft` and `TapLeft` are not part of the `Maybe<T>` API and when to prefer `Either<TLeft, TRight>` or `Result<T>`.
+
 ## 0.3.0 - 2026-04-08
 
 ### Added
